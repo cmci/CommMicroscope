@@ -20,7 +20,7 @@ import org.apache.commons.io.monitor.FileAlterationObserver;
 public abstract class AbsMonitorFolderFiles {
     // A hardcoded path to a folder you are monitoring .
     private String watchpath =
-            "/Users/miura/Desktop/tmp/watch";
+            "C:\\FolderName\\";
     
     public String getWatchpath() {
 		return watchpath;
@@ -58,7 +58,12 @@ public abstract class AbsMonitorFolderFiles {
             public void onFileCreate(File file) {
             	runOnNewFile(file);
             }
-
+            
+            // Is triggered when a file is changed the monitored folder
+            public void onFileChange(File file) {
+            	runOnChangedFile(file);
+            }
+            
             // Is triggered when a file is deleted from the monitored folder
             @Override
             public void onFileDelete(File file) {
@@ -136,7 +141,11 @@ public abstract class AbsMonitorFolderFiles {
     // runs on addition of new file to the monitoring folder. To be implemented.
     abstract void runOnNewFile(File file);
 
-    // runs on addition of new file to the monitoring folder. To be implemented
+    // runs when a file gets modified in the monitoring folder. To be implemented.
+    abstract void runOnChangedFile(File file);
+
+    
+    // runs on removal of file in the monitoring folder. To be implemented
     abstract void runOnFileRemove(File file);   
 
 

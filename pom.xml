@@ -11,9 +11,20 @@
 		<version>1.28</version>
 	</parent>
 
+    <repositories>
+        <repository>
+            <id>imagej.releases</id>
+            <url>http://maven.imagej.net/content/repositories/releases</url>
+        </repository>
+        <repository>
+            <id>imagej.snapshots</id>
+            <url>http://maven.imagej.net/content/repositories/snapshots</url>
+        </repository>
+    </repositories>
+    
 	<groupId>embl.almf</groupId>
 	<artifactId>Microscope_Communicator</artifactId>
-	<version>1.1.0</version>
+	<version>1.1.1</version>
 
 	<name>plugins/Microscope_Communicator.jar</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin.

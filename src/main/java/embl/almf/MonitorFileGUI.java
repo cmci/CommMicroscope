@@ -8,6 +8,7 @@ package embl.almf;
  */
 
 import ij.IJ;
+import ij.Macro;
 
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
@@ -20,16 +21,10 @@ import java.util.Observable;
 import java.util.Observer;
 
 import javax.swing.BorderFactory;
-import javax.swing.Box;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JToggleButton;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
-
 import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
@@ -43,7 +38,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	FileAlterationMonitor monitor = null;
 	JLabel label1, label2, label3, label4, label5, label6;
 	JLabel labelCount1, labelCount2;
-	JButton b2, b3;
+	JButton b1, b2, b3;
 	private RunMacroOnMonitoredFiles mff;
 	private RunJythonOnMonitoredFiles jff;
 	private MonitorFileGUI mgui;
@@ -114,7 +109,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		for (FileAlterationObserver obs : obslist){
 			targetfolder = obs.getDirectory().getCanonicalPath();
 			IJ.log(targetfolder);
-			guicontructor(targetfolder, macrofile);
+			guiconstructor(targetfolder, macrofile);
 		}
 		
 	}
@@ -132,7 +127,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 			maxcount = jff.maxrun;
 			newfile = ((RunJythonOnMonitoredFiles) rmf).getLatestFileName();
 		}	
-		labelCount2.setText(Integer.toString(runcount) + " / " + Integer.toString(maxcount));
+		labelCount2.setText(Integer.toString(runcount));
 		IJ.log("new:" + newfile);
 		label6.setText(newfile);
 		if (runcount >= maxcount){
@@ -142,9 +137,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	}
 	
 	
-	public void guicontructor(String targetfolder, String macrofile){
-		//getContentPane().setLayout(new FlowLayout());
-
+	public void guiconstructor(String targetfolder, String macrofile){
 		Font font1 = new Font("Default", Font.PLAIN, 12);
 		Font font1small = new Font("DefaultSmall", Font.PLAIN, 12);		
 		Font font2 = new Font("Serif", Font.BOLD, 15);
@@ -159,18 +152,22 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		label3 = new JLabel("Script File:  ");
 		label4 = new JLabel(macrofile);
 		label4.setFont(font1small);
-
+		
+		b1 = new JButton("Restart");
+		b1.addActionListener(this);
+		
 		b2 = new JButton("Close");
 		b2.addActionListener(this);
 		
 		b3 = new JButton("Stop");
 		b3.addActionListener(this);
+		JButton b4 = new JButton("Bla");
 		
 		labelCount1 = new JLabel("Counts:");
 		if (scripttype == "macro")
-			labelCount2 = new JLabel(Integer.toString(mff.runcount) + " / " + Integer.toString(mff.maxrun));		
+			labelCount2 = new JLabel(Integer.toString(mff.runcount) );		
 		else
-			labelCount2 = new JLabel(Integer.toString(jff.runcount) + " / " + Integer.toString(jff.maxrun));
+			labelCount2 = new JLabel(Integer.toString(jff.runcount) );
 		labelCount2.setFont(fontBIG);
 		label5 = new JLabel("The Latest File:");
 		label6 = new JLabel("");
@@ -190,14 +187,16 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		upperp.add(label4);
 
 		JPanel middlep = new JPanel();
-		middlep.setLayout(new GridLayout(2, 1));		
+		middlep.setLayout(new GridLayout(3, 1));		
 		middlep.setBorder(BorderFactory.createTitledBorder("Status Controls"));
 		JPanel buttonsp = new JPanel();
+		buttonsp.setLayout(new FlowLayout(1, 5, 0));
+		buttonsp.add(b1);	
 		buttonsp.add(b3);
-		buttonsp.add(b2);		
+		buttonsp.add(b2);
 		middlep.add(buttonsp);
 		JPanel countsp = new JPanel();
-		countsp.setLayout(new FlowLayout());
+		countsp.setLayout(new FlowLayout(1, 10, 10));
 		countsp.add(labelCount1);
 		countsp.add(labelCount2);
 		middlep.add(countsp);
@@ -214,24 +213,9 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		fullp.add(upperp);
 		fullp.add(middlep);
 		fullp.add(lowerp);
-		
-//		getContentPane().add(label1);
-//		getContentPane().add(label2);
-//		getContentPane().add(label3);
-//		getContentPane().add(label4);
-//		getContentPane().add(b3);
-//		getContentPane().add(b2);
-
-//		JToggleButton b1;
-//		if (monitor != null)
-//			b1 = new JToggleButton("Running");
-//		else
-//			b1 = new JToggleButton("OFF");
-//		b1.addChangeListener(this);
-//		getContentPane().add(b1);
 
 		getContentPane().add(fullp, BorderLayout.CENTER);
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setTitle("Monitoring Status");
 		setSize(400, 350);
 		setVisible(true);
@@ -264,14 +248,47 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 //	}
 	
 	public void actionPerformed(ActionEvent e) {
-		//close clicked
+		//Restart clicked
+		if (e.getSource() == b1) {
+			if (mff != null) {
+				mff.runcount = 0;	
+				labelCount2.setText( Integer.toString(mff.runcount));
+				labelCount1.setText("Counts:");
+				b3.setEnabled(true);
+				 try {
+					 mff.startMonitoring();
+				 } catch (Exception e1) {
+					 // TODO Auto-generated catch block
+					 e1.printStackTrace();
+				 }
+			}
+					
+			if (jff != null) {
+				jff.runcount = 0;
+				labelCount2.setText( Integer.toString(mff.runcount));
+				 try {
+					 jff.startMonitoring();
+				 } catch (Exception e1) {
+					 // TODO Auto-generated catch block
+					 e1.printStackTrace();
+				 }
+			}
+			System.out.println("Restart listener...");
+		}
+		
 		if (e.getSource() == b2) {
-			if (mff != null)
+			if (mff != null) {
 				mff.removeObservers();
-			if (jff != null)
-				jff.removeObservers();				
+				mff = null;
+			}
+			if (jff != null) {
+				jff.removeObservers();	
+				jff = null;
+			}
 			System.out.println("Desroying GUI...");
+		
 			this.dispose();
+			Macro.abort();
 		}
 		//stop clicked
 		if (e.getSource() == b3){
@@ -307,8 +324,8 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	public static void main(String[] args) {
 		MonitorFileGUI mgui = new MonitorFileGUI();
 		try {
-			//mgui.executeGUImacro();
-			mgui.executeGUIjython();
+			mgui.executeGUImacro();
+			//mgui.executeGUIjython();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

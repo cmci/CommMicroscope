@@ -1,21 +1,28 @@
 #Microscope Communicator
 
 ##Authors: 
+
 Christian Tischer (ALMF, EMBL Heidelberg)
 
 Kota Miura (CMCI, EMBL Heidelberg)
 
+Antonio Politi (CBB, EMBL Heidelberg)
+
 ##Installation
 
-Downloaad the jar file. You need a library "Apache Commons IO" as well. Place both files under plugins folder in Fiji. Refresh the menu or restart the Fiji.
+ Create java using mvn package or download the jar file. You need a library "Apache Commons IO" (http://commons.apache.org/proper/commons-io//) as well. Place both files under plugins folder in Fiji. Refresh the menu or restart the Fiji.
 
 Commands will be located under Plugins > ALMF >
 
 ##Descriptions
 
-###Microscope Communicator
+###Microscope Communicator (Outdated)
 
-Select Microscope type, choose an action and a command to send.
+Select Microscope type, choose an action and a command to send. 
+
+###ReadWriteWindowsRegistry
+
+Allows to write and read from registry a specifc key
 
 ###Run a Macro on New Image
 

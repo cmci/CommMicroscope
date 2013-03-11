@@ -25,7 +25,11 @@ public class TestMonitorFiles extends AbsMonitorFolderFiles {
 //		}
 //
 //	}
-
+	@Override
+	void runOnChangedFile(File file) {
+		runOnNewFile(file);
+	}
+	
 	@Override
 	void runOnNewFile(File file) {
         try {
