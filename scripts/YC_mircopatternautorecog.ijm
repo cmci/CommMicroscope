@@ -1,10 +1,16 @@
-filepath = getArgument();
-print filepath
-run("Bio-Formats Importer", "open=" + filepath + " autoscale color_mode=Default view=Hyperstack stack_order=XYCZT");
-/*macro "YC_micropatternautorecog" {
+
+'filepath = getArgument();
+filepath = "C:\\Test\\incu90min_W001_P001_T001.lsm"
+
+ if (endsWith(filepath,"lsm")) {
+ 	run("Close All");
+ 	open(filepath);
+ 	getPixelSize(unit, pixelWidth, pixelHeight);
+ 	getDimensions(width, height, channels, slices, frames);
+ 	setBatchMode(true);
 	roiManager("reset")
 	run("Clear Results");
-	open(filepath)
+
 	image_name = getTitle();
 	selectWindow(image_name);
 	run("Split Channels");
@@ -128,8 +134,8 @@ run("Bio-Formats Importer", "open=" + filepath + " autoscale color_mode=Default 
 	close();
 	}
 	selectWindow("Result of C1-"+image_name);
-	close()
-
+	close();
+       
         selectWindow("C3-"+image_name);
 	run("Clear Results");
 	roiManager("Deselect");
@@ -139,10 +145,43 @@ run("Bio-Formats Importer", "open=" + filepath + " autoscale color_mode=Default 
 	run("Set Measurements...", "  centroid bounding redirect=None decimal=1");
         run("Analyze Particles...", "size=0-1000 circularity=0.00-1.00 show=Masks display exclude include add in_situ");
         roiManager("Show None");
-        close()
+        close();
+
         run("Merge Channels...", "c1=[C2-"+image_name+"] c2=[C1-"+image_name+"] create");
         run("Stack to RGB");
         selectWindow("Composite");
+        setBatchMode(false);
         roiManager("Show All");
+        roiManager("Select All");
+        saveAs("tiff", File.getParent(filepath)+ "\\" +File.nameWithoutExtension + ".tif");
 
-}*/
+        //Write out positions to  folder
+ 	String.resetBuffer;
+
+ 	if ( unit == "µm" ) {
+ 		unit = "um";
+ 	}
+	run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=unit value=["+ unit +"] windows=REG_SZ");
+
+	String.resetBuffer;
+	//nrPoints = nResults
+	nrPoints = 1;
+        for( i = 0; i< nrPoints-2; i++) {
+        	out = getResult("X",i) - width*pixelWidth/2;
+        	String.append(out + ", ");
+        }
+        out = getResult("X",nrPoints-1) - width*pixelWidth/2;
+        String.append(out);
+        run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=offsetx value=["+ String.buffer +"] windows=REG_SZ");
+	String.resetBuffer;
+        for( i = 0; i< nrPoints-2; i++) {
+        	out = getResult("Y",i) - height*pixelHeight/2;
+        	String.append(out + ", ");
+        }
+        out = getResult("Y",nrPoints-1) - height*pixelHeight/2;
+        String.append(out);
+        run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=offsety value=["+ String.buffer +"] windows=REG_SZ");
+        run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=fileAnalyzed value=["+ filepath +"] windows=REG_SZ");
+	run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=Code value=[3] windows=REG_SZ");
+
+}

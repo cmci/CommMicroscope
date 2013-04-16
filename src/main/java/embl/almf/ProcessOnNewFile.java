@@ -39,7 +39,7 @@ public class ProcessOnNewFile extends AbsMonitorFolderFiles {
 	 */
 	@Override
 	void runOnChangedFile(File file) {
-		runOnNewFile(file);
+		//runOnNewFile(file);
 	}
 	
 	/** This method is triggered when a file is added to the watchpath.
@@ -56,12 +56,6 @@ public class ProcessOnNewFile extends AbsMonitorFolderFiles {
         IJ.log("File created: " + fullpath);
         ImagePlus imp = IJ.openImage(fullpath);
         mc.setFilepath(fullpath);
-        
-        // here, need to make decision using probability examinations. 
-//        if (decision)
-//        	mc.image_selected_particle(int offsetx, int offsety);
-//        else
-//        	mc.do_nothing();
         IJ.log("retrieved newly added file");
         
         // stop monitoring after several rounds, this should be controllable from outside at some point. 

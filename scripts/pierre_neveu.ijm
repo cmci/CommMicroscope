@@ -1,47 +1,31 @@
 /* Determine colony size and give back imaging positions
  * Pierre Neveu
  */
-
-
-
-//filelist=getArgument();
+ 
+//filepath = "C:\\Users\\Antonio Politi\\Code\\AutomatedMicroscopy\\CommMicroscope\\scripts\\pierre_neveu.lsm";
+print("Hello1!");
+filepath=getArgument();
 run("Clear Results");
+run("Close All");
 run("Set Measurements...","area mean centroid center bounding fit redirect=None decimal=6");
-volumedir="/Users/neveu/projects/tischi/516_1/";
-//volumedir="/Users/neveu/projects/tischi/highres_moreZ/";
+if (endsWith(filepath,"lsm")) {
 
-// keep only lsm files
-allfilelist=getFileList(volumedir);
-alllsmfiles="";
-for (j=0; j<lengthOf(allfilelist); j++){
-	if (endsWith(allfilelist[j],".lsm")) {
-		alllsmfiles=alllsmfiles+","+allfilelist[j];
-		}
-}
-filelist=split(alllsmfiles,",");
-
-for (j=0; j<lengthOf(filelist); j++){
-run("Clear Results");
-open(volumedir+filelist[j]);
+open(filepath);
 
 // Get scaling factors for x, y and z
+
 imageinfo=getImageInfo();
 allinfo=split(imageinfo,"\n");
-scale=newArray(3);
+
+
 if (bitDepth()==8 || bitDepth()==16) {
 	upperThreshold=pow(2,bitDepth())*0.9;}
-	else {upperThreshold=100000;}
-for (i=0; i<lengthOf(allinfo); i++) {
-	if (startsWith(allinfo[i],"Voxel_size_X")) {
-		aaa=split(allinfo[i]," ");
-		scale[0]=aaa[1];}
-	else  if (startsWith(allinfo[i],"Voxel_size_Y")) {
-		aaa=split(allinfo[i]," ");
-		scale[1]=aaa[1];} 
-	else  if (startsWith(allinfo[i],"Voxel_size_Z")) {
-		aaa=split(allinfo[i]," ");
-		scale[2]=aaa[1];} 
-}
+else {upperThreshold=100000;}
+
+//this is not used
+scale=newArray(3);
+getVoxelSize(scale[0], scale[1], scale[2],unit);
+
 
 id=getImageID;
 getDimensions(nWidth,nHeight,nChannels,n,nZ);
@@ -53,6 +37,7 @@ run("Fill Holes","stack");
 run("Erode", "iterations=7 stack");
 run("Open", "iterations=7 stack");
 run("Select All");
+getVoxelSize(voxelX, voxelY, voxelZ, unit);
 
 meanIntensities=newArray(n*nChannels);
 stdIntensities=newArray(n*nChannels);
@@ -82,14 +67,12 @@ if (nChannels>1) {
 	}	
 }
 
-
 //find center of colony
-
 mmean=Array.slice(meanIntensities,brightestChannel*n,(brightestChannel+1)*n);
 Fit.doFit("Gamma Variate",x, mmean);
-colonymiddle=round(Fit.p(0)+Fit.p(2)*Fit.p(3));
-if (colonymiddle>n/2){zstop=n;}
-	else {zstop=2*colonymiddle;}
+c olonymiddle=round(Fit.p(0)+Fit.p(2)*Fit.p(3));
+if (colonymiddle>n/2){ zstop=n; }
+	else {zstop = 2*colonymiddle;}
 run("Clear Results");
 
 //find region to image
@@ -109,22 +92,41 @@ for (i=0;i<nResults; i++){
 	yMin=minOf(yMin,by1);
 	xMax=maxOf(xMax,bx2);
 	yMax=maxOf(yMax,by2);
+
 }
 
+// give coordinates with respect to middle. 0,0,0 is no change in positio
+offsetX = maxOf(floor((xMin+xMax)/2),0) - nWidth/2;
+offsetY = maxOf(floor((yMin+yMax)/2),0) - nHeight/2;
+offsetZ = colonymiddle - nZ/2;
+deltaX = minOf(xMax-xMin+20,nWidth-1-xMin);
+deltaY = minOf(yMax-yMin+20,nHeight-1-xMin);
+deltaZ = zstop;
 
-//write parameters in textfile
-textfile=volumedir+replace(filelist[j],".lsm",".txt");
+//write parameters out and regitry
+textfile=replace(filepath,".lsm","_positions.txt");
 f=File.open(textfile);
-print(f,"Z = "+colonymiddle);
-print(f,"DeltaZ = "+zstop);
-print(f,"X = "+maxOf(floor((xMin+xMax)/2),0));
-print(f,"DeltaX = "+minOf(xMax-xMin+20,nHeight-1-xMin));
-print(f,"Y = "+maxOf(floor((yMin+yMax)/2),0));
-print(f,"DeltaY = "+minOf(yMax-yMin+20,nHeight-1-xMin));
-
+print(f,"offsetX = "+offsetX);
+print(f,"offsetY = "+offsetY);
+print(f,"offsetZ = "+offsetZ);
+print(f,"DeltaX = "+deltaX);
+print(f,"DeltaY = "+deltaY);
+print(f,"DeltaZ = "+deltaZ);
 File.close(f);
-selectWindow("Drawing of "+filelist[j]);
-close;
-selectWindow(filelist[j]);
+
+
+ if ( unit == "µm" ) {
+ 	unit = "um";
+ }
+ 
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=unit value=["+ unit +"] windows=REG_SZ");
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=offsetx value=["+ offsetX +"] windows=REG_SZ");
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=offsety value=["+ offsetY +"] windows=REG_SZ");
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=offsetz value=["+ offsetZ +"] windows=REG_SZ");
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=DeltaZ value=["+ deltaZ +"] windows=REG_SZ");
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=fileAnalyzed value=["+ filepath +"] windows=REG_SZ");
+run("Read Write Windows Registry", "action=write location=[HKCU\\SOFTWARE\\VB and VBA Program Settings\\OnlineImageAnalysis\\macro] key=Code value=[6] windows=REG_SZ");
 close();
 }
+
+

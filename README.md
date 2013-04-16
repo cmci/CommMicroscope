@@ -48,6 +48,9 @@ The file path to the new image will be stored in a variable called
 and can be used directly in the script. 
 
 ##Versions
+###1.1.3 (20130415)
+Antonio's contibutions:
+- button restart reloads the macro in monitor
 
 ###1.1.2 (20130311)
 Antonio's bugfix:

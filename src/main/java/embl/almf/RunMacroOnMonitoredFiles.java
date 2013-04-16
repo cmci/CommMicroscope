@@ -38,6 +38,7 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	JTextField directory, macrotorun;
 	String watchpath;
 	String macropath = "";
+	//This contains the full macro
 	String macrotext = "";
 	int maxrun = Integer.MAX_VALUE;
 	String monitor_threadname = "";
@@ -153,7 +154,7 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 		if (e.getSource() == bt_open2) {
 			//Do something
 			//IJ.log("pushed open1");
-			OpenDialog od = new OpenDialog("Choose a .mrc file", null); 
+			OpenDialog od = new OpenDialog("Choose a .ijm file", null); 
 			this.macropath =  od.getDirectory() + od.getFileName();
 			this.macrotext = IJ.openAsString(this.macropath);
 			//this.watchpath =

@@ -85,7 +85,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	}
 
 	public void executeGUIjython() throws IOException {
-		scripttype = "jytnon";
+		scripttype = "jython";
 		jff = new RunJythonOnMonitoredFiles();
 		IJ.log("Monitor starting up...");
 		jff.execute();
@@ -161,7 +161,6 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		
 		b3 = new JButton("Stop");
 		b3.addActionListener(this);
-		JButton b4 = new JButton("Bla");
 		
 		labelCount1 = new JLabel("Counts:");
 		if (scripttype == "macro")
@@ -252,6 +251,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		if (e.getSource() == b1) {
 			if (mff != null) {
 				mff.removeObservers();
+				mff.macrotext = IJ.openAsString(mff.macropath);
 				mff.runcount = 0;	
 				labelCount2.setText( Integer.toString(mff.runcount));
 				labelCount1.setText("Counts:");
@@ -265,7 +265,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 			}
 			if (jff != null) {
 				jff.removeObservers();	
-				jff.runcount = 0;	
+				jff.runcount = 0;
 				labelCount2.setText( Integer.toString(jff.runcount));
 				labelCount1.setText("Counts:");
 				b3.setEnabled(true);
