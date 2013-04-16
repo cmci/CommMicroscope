@@ -4,6 +4,7 @@ filepath = "C:\\Test\\incu90min_W001_P001_T001.lsm"
 
  if (endsWith(filepath,"lsm")) {
  	run("Close All");
+ 	run("Clear Results");
  	open(filepath);
  	getPixelSize(unit, pixelWidth, pixelHeight);
  	getDimensions(width, height, channels, slices, frames);
