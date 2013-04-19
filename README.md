@@ -35,7 +35,7 @@ The file path should be retrieved in the macro by
 
 *filepath = getArgument()*
 
-During monitoring, a small window will be staying on your desktop. To force quit the monitoring, click stop or close button.
+During monitoring, a small window will be staying on your desktop. To force quit the monitoring, click stop or close button. Restart will stop and restart the monitoring and reload the macro.
 
 ###Run a Jython on New Image
 

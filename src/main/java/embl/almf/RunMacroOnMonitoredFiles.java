@@ -83,7 +83,7 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	
 	@Override
 	void runOnChangedFile(File file) {
-		runOnNewFile(file);
+		//runOnNewFile(file);
 	}
 
 	@Override
@@ -105,7 +105,6 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
         monitorthread = Thread.currentThread();
 		monitor_threadname = monitorthread.getName();
         IJ.log("folder monitor thread name:" + monitor_threadname);
-		//mr.run();
         this.runcount += 1;
         
         if (this.runcount >= maxrun ){

@@ -1,0 +1,3 @@
+Create a LinkedList for the files to be analysed. 
+Analyse them one of the othe if they are concurrent,
+
