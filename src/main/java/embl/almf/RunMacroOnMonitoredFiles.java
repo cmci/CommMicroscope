@@ -83,7 +83,7 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	
 	@Override
 	void runOnChangedFile(File file) {
-		runOnNewFile(file);
+		//runOnNewFile(file);
 	}
 
 	@Override
