@@ -35,8 +35,9 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	boolean okpushed, cancelpushed;
 	JFrame Dialog;
 	JButton bt_open1, bt_open2, bt_ok, bt_cancel;
-	JTextField directory, macrotorun;
+	JTextField directory, macrotorun, fileEndDialog;
 	String watchpath;
+	String fileEnd ="lsm";
 	String macropath = "";
 	//This contains the full macro
 	String macrotext = "";
@@ -83,7 +84,7 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	
 	@Override
 	void runOnChangedFile(File file) {
-		//runOnNewFile(file);
+		runOnNewFile(file);
 	}
 
 	@Override
@@ -100,22 +101,20 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 				// set message field for currently recognized file
 			}
 		}
-		this.setLatestFileName(addedfilepath);
-		MacroRunner mr = new MacroRunner(macrotext, addedfilepath);
-        monitorthread = Thread.currentThread();
-		monitor_threadname = monitorthread.getName();
-        IJ.log("folder monitor thread name:" + monitor_threadname);
-        this.runcount += 1;
+		
+		//check file end
+		if ( addedfilepath.endsWith(this.fileEnd)) { 
+			this.setLatestFileName(addedfilepath); //notifies also observer
+			MacroRunner mr = new MacroRunner(macrotext, addedfilepath);
+	        monitorthread = Thread.currentThread();
+			monitor_threadname = monitorthread.getName();
+	        IJ.log("folder monitor thread name:" + monitor_threadname);
+	        this.runcount += 1;
         
-        if (this.runcount >= maxrun ){
-        	IJ.log("monitoring stopped: " + Integer.toString(runcount) + " iterations.");
-        	try {
-        		this.stopMonitor();
-    		} catch (Exception e) {
-    			// TODO Auto-generated catch block
-    			e.printStackTrace();
-    		}     		
-        }
+	        if (this.runcount >= maxrun ){
+	        	this.runcount = 1;  		
+	        }
+		}
 		
 	}
 
@@ -141,6 +140,11 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	public void setMacroFile(String macrofilepath){
 		this.macropath = macrofilepath;
 	}
+	
+	public void setFilEnd(String fileEnd){
+		this.fileEnd = fileEnd;
+	}
+	
 
 	public void actionPerformed(ActionEvent e) {
 		if (e.getSource() == bt_open1) {
@@ -163,6 +167,8 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 			//Do something
 			//IJ.log("pushed Ok");
 			//check for folder and macropath
+			this.fileEnd = fileEndDialog.getText();
+			IJ.log(" monotor files with ending" + this.fileEnd);
 			if (!checkMacroFileExists(macropath)) {
 				IJ.log("No such macro file: " + this.macropath);
 			}
@@ -194,10 +200,12 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 		Dialog = new JFrame("Macro Runner Settings");
 		directory = new JTextField("",20);
 		macrotorun = new JTextField("",20);
+		fileEndDialog = new JTextField("lsm", 3);
 		JLabel labeldir = new JLabel("Directory");
 		JLabel labelmacro = new JLabel("Macro");
-		JLabel msg = new JLabel("Applys a macro when a new file appears " +
-				"in a monitoring directory.");
+		JLabel labelFileEnd = new JLabel("File type");
+		JLabel msg = new JLabel("Applies a macro when a new file appears " +
+				"in a monitored directory.");
 		msg.setFont(font1small);
 		labeldir.setFont(font1small);
 		labelmacro.setFont(font1small);
@@ -209,7 +217,7 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 		bt_open2 = new JButton("Browse");
 		bt_open2.addActionListener(this);
 		bt_open2.setFont(font1);
-
+		
 		bt_ok = new JButton("OK");
 		bt_ok.setFont(font1);
 		bt_cancel = new JButton("Cancel");
@@ -222,28 +230,38 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 		topp.add(msg);
 		
 		JPanel upperp = new JPanel();
-		upperp.setLayout(new FlowLayout(1,5,0));
+		upperp.setLayout(new FlowLayout(1,3,0));
 		upperp.add(labeldir);
 		upperp.add(directory);
 		upperp.add(bt_open1);
 		
 		JPanel middlep = new JPanel();
-		middlep.setLayout(new FlowLayout(1,5,0));
+		middlep.setLayout(new FlowLayout(1,3,0));
 		middlep.add(labelmacro);
 		middlep.add(macrotorun);
 		middlep.add(bt_open2);
 		
+		JPanel middlep2 = new JPanel();
+		middlep2.setLayout(new FlowLayout(1,2,0));
+		middlep2.add(labelFileEnd);
+		middlep2.add(fileEndDialog);
+		
+		
 		JPanel lowerp = new JPanel();
-		lowerp.setLayout(new FlowLayout(1,5,0));
+		lowerp.setLayout(new FlowLayout(1,2,0));
 		lowerp.add(bt_ok);
 		lowerp.add(bt_cancel);
 		
+		
+		
 		JPanel fullp = new JPanel();
-		fullp.setLayout(new GridLayout(4,1));
+		fullp.setLayout(new GridLayout(5,1));
 		fullp.add(topp);
 		fullp.add(upperp);
 		fullp.add(middlep);
+		fullp.add(middlep2);
 		fullp.add(lowerp);
+		
 		
 		Dialog.getContentPane().add(fullp, BorderLayout.CENTER);
 		Dialog.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);

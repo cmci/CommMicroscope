@@ -13,13 +13,15 @@
 
 	<groupId>embl.almf</groupId>
 	<artifactId>Microscope_Communicator</artifactId>
-	<version>1.1.4</version>
+	<version>1.1.5</version>
 
 	<name>plugins/Microscope_Communicator.jar</name>
 	<description>A Maven project implementing an ImageJ 1.x plugin.
 	Listen to a folder and execute files.
 	Communicates with microscope system to send/retireve various info including commands. 
-	Works only in Windows, as windows registry is used for triggering actions.</description>
+	RunMacroOnMonitoredFiles works on any system as it listen to new files appearing in directory.
+	
+The executable writing the regisrty works only on Windows</description>
 
 	<dependencies>
 		<dependency>
