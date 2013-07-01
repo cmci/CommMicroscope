@@ -10,9 +10,9 @@ imgpath = getArgument();
 Check if file is lsm and weather it has been generated from Autofocus Job
 Typical filname is
 
-aString_JobName_Wxxx_Pxxx_Txxx.lsm
+aString_JobName_Wxxxx_Pxxxx_Txxxx.lsm
 or
-JobName_Wxxx_Pxxx_Txxx.lsm
+JobName_Wxxxx_Pxxxx_Txxxx.lsm
 
 JobNames created by AutofocusMacro version >2.2  contain the strings
 Autofocus: 	 	 AF_
@@ -46,7 +46,7 @@ if (endsWith(imgpath, "lsm") & indexOf(imgpath, "AF_" ) > 0 )
 	// For focusing if you pass the center of the image this will not change the position of the stage. for example coordinates passed
 	X = nWidth/2*scalex; Y = nHeight/2*scaley;
 	run("Read Write Windows Registry", "action=write location=[" + locationReg + "] key=X value=["+ X +"] windows=REG_SZ");
-	run("Read Write Windows Registry", "action=write location=[" + locationReg + "] key=Y value=["+ X +"] windows=REG_SZ");
+	run("Read Write Windows Registry", "action=write location=[" + locationReg + "] key=Y value=["+ Y +"] windows=REG_SZ");
 	
 	// Z coordinate of middle slice
 	// convention is 0 is bottom of stack. In pixel unit one slice is one pixel. Passing the middle slice keep the focus constant
