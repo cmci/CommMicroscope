@@ -39,11 +39,10 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	JLabel label1, label2, label3, label4, label5, label6;
 	JLabel labelCount1, labelCount2;
 	JButton b1, b2, b3;
+	String scripttype;
 	private RunMacroOnMonitoredFiles mff;
-	private RunJythonOnMonitoredFiles jff;
+	private RunMacroOnMonitoredFiles jff;
 	private MonitorFileGUI mgui;
-	private String scripttype = "macro";
-
 	private static final long serialVersionUID = 1L;
 	
 	public void setMonitor(FileAlterationMonitor monitor) {
@@ -69,6 +68,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		scripttype = "macro";
 		mff = new RunMacroOnMonitoredFiles();
 		IJ.log("Monitor starting up...");
+		mff.scripttype = 0;
 		mff.execute();
 		if (mff.monitor == null){
 			IJ.log("no monitor found");
@@ -85,9 +85,10 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	}
 
 	public void executeGUIjython() throws IOException {
-		scripttype = "jython";
-		jff = new RunJythonOnMonitoredFiles();
+		scripttype = "python";
+		jff = new RunMacroOnMonitoredFiles();
 		IJ.log("Monitor starting up...");
+		jff.scripttype = 1;
 		jff.execute();
 		if (jff.monitor == null){
 			IJ.log("no monitor found");
@@ -97,7 +98,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		this.monitor = jff.monitor;
 		IJ.log("Filling up GUI...");
 		
-		createGUI(this.monitor, jff.jythonpath);
+		createGUI(this.monitor, jff.macropath);
 		
 		if (!this.isVisible())
 			this.setVisible(true);
@@ -125,7 +126,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 		} else {
 			runcount = jff.runcount + 1;
 			maxcount = jff.maxrun;
-			newfile = ((RunJythonOnMonitoredFiles) rmf).getLatestFileName();
+			newfile = ((RunMacroOnMonitoredFiles) rmf).getLatestFileName();
 		}	
 		labelCount2.setText(Integer.toString(runcount));
 		IJ.log("new:" + newfile);
@@ -222,29 +223,6 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 	public void destroyObservers(){
 		
 	}
-//	public void stateChanged(ChangeEvent e) {
-//		JToggleButton btn = (JToggleButton)e.getSource();
-//		Iterable<FileAlterationObserver> obslist = monitor.getObservers();
-////		for (FileAlterationObserver obs : obslist)
-////			IJ.log(obs.toString());	
-//		if (btn.isSelected()) {
-//			if ()
-//				btn.setText("Running");
-//	
-//			else
-//				btn.setText("offline");
-//		} else {
-//			btn.setText("stopped");
-////			if (monitor != null){
-////				try {
-////					monitor.stop();
-////				} catch (Exception e1) {
-////					// TODO Auto-generated catch block
-////					e1.printStackTrace();
-////				}
-//			}
-//		}
-//	}
 	
 	public void actionPerformed(ActionEvent e) {
 		//Restart clicked
@@ -263,6 +241,7 @@ public class MonitorFileGUI extends JFrame implements ActionListener, Observer {
 					e1.printStackTrace();
 				 }
 			}
+			
 			if (jff != null) {
 				jff.removeObservers();	
 				jff.runcount = 0;

@@ -15,6 +15,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -23,13 +24,14 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.border.Border;
 
+import common.ScriptRunner;
+
 
 
 import ij.IJ;
 import ij.Macro;
 import ij.io.OpenDialog;
 import ij.macro.MacroRunner;
-
 
 public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements ActionListener {
 	boolean okpushed, cancelpushed;
@@ -39,6 +41,8 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 	String watchpath;
 	String fileEnd ="lsm";
 	String macropath = "";
+	int scripttype = 0; //0 or MACRO, 1 for jython
+	
 	//This contains the full macro
 	String macrotext = "";
 	int maxrun = Integer.MAX_VALUE;
@@ -104,8 +108,23 @@ public class RunMacroOnMonitoredFiles extends AbsMonitorFolderFiles implements A
 		
 		//check file end
 		if ( addedfilepath.endsWith(this.fileEnd)) { 
+			IJ.log("start script");
 			this.setLatestFileName(addedfilepath); //notifies also observer
-			MacroRunner mr = new MacroRunner(macrotext, addedfilepath);
+			switch (this.scripttype) {
+				case 0://MACRO
+					MacroRunner mr = new MacroRunner(macrotext, addedfilepath);
+					break;
+				case 1: //JYTHON
+					IJ.log("Initiate script");
+					HashMap<String, Object> arg = new HashMap<String, Object>();
+					arg.put("newImagePath", addedfilepath);
+					ScriptRunner.runPY(this.macropath, arg);
+					break;
+				default:
+					IJ.log("scriptype values are 0: MACRO, 1:JYTHON");
+					throw new IllegalArgumentException("scriptype values are 0: MACRO, 1:JYTHON");
+			}
+				
 	        monitorthread = Thread.currentThread();
 			monitor_threadname = monitorthread.getName();
 	        IJ.log("folder monitor thread name:" + monitor_threadname);

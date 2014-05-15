@@ -17,7 +17,7 @@ class WindowsRegistry {
 	 * @param key registry key
 	 * @return registry value or null if not found
 	 */
-
+	
 	public static final String writeRegistry(String location, String key, String value){
 		try {
 
