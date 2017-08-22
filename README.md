@@ -25,7 +25,7 @@ Select Microscope type, choose an action and a command to send.
 
 ###ReadWriteWindowsRegistry
 
-Allows to write and read from registry a specifc key
+Allows to write and read from registry a specific key
 
 ###Run a Macro on New Image
 

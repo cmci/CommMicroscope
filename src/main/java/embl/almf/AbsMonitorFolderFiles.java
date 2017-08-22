@@ -6,7 +6,6 @@ package embl.almf;
 // http://andreinc.net/2012/06/30/writing-a-simple-file-monitor-in-java-using-commons-io/
 
 import ij.IJ;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
